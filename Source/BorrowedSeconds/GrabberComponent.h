@@ -41,7 +41,7 @@ public:
 
 	/** Collision channel used by the grab sweep. Visibility preserves existing content. */
 	UPROPERTY(EditAnywhere, Category = "Interaction")
-	TEnumAsByte<ECollisionChannel> GrabTraceChannel = ECC_Visibility;
+	TEnumAsByte<ECollisionChannel> GrabTraceChannel = ECC_GameTraceChannel2;
 
 	UPROPERTY(VisibleAnywhere)
 	UPhysicsHandleComponent* PhysicsHandle;
