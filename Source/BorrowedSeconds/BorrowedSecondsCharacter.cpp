@@ -152,8 +152,14 @@ void ABorrowedSecondsCharacter::LookInput(const FInputActionValue& Value)
 
 void ABorrowedSecondsCharacter::MouseLookInput(const FInputActionValue& Value)
 {
-	const FVector2D LookAxisVector = Value.Get<FVector2D>() * MouseSensitivity;
-	DoAim(LookAxisVector.X, LookAxisVector.Y);
+	const FVector2D RawLookInput = Value.Get<FVector2D>();
+
+	const FVector2D ScaledLookInput(
+		RawLookInput.X * MouseSensitivityX,
+		RawLookInput.Y * MouseSensitivityY
+	);
+
+	DoAim(ScaledLookInput.X, ScaledLookInput.Y);
 }
 
 void ABorrowedSecondsCharacter::DoAim(float Yaw, float Pitch)

@@ -78,7 +78,10 @@ protected:
 	void MouseLookInput(const FInputActionValue& Value);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Input", meta = (ClampMin = "0.01", ClampMax = "10.0"))
-	float MouseSensitivity = 1.0f;
+	float MouseSensitivityX = 1.0f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Input", meta = (ClampMin = "0.01", ClampMax = "10.0"))
+	float MouseSensitivityY = 1.0f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Movement Feel", meta = (ClampMin = "0.0"))
 	float GroundAcceleration = 2048.0f;
