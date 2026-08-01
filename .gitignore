@@ -9,6 +9,9 @@ Build/
 BorrowedSecondsShare/
 *.zip
 
+# Generated audio audition drafts (final exports live in AudioSource/Final)
+AudioSource/Original/
+
 # IDE and generated project files
 .vs/
 .vscode/
@@ -30,4 +33,3 @@ Config/DefaultEditorPerProjectUserSettings.ini
 .DS_Store
 Thumbs.db
 Desktop.ini
-
