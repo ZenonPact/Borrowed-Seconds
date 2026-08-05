@@ -2,6 +2,7 @@
 
 
 #include "MoverComponent.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values for this component's properties
 UMoverComponent::UMoverComponent()
@@ -46,7 +47,33 @@ void UMoverComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 
 void UMoverComponent::SetShouldMove(bool Mover)
 {
+	if (ShouldMove == Mover)
+	{
+		return;
+	}
+	UE_LOG(
+		LogTemp,
+		Warning,
+		TEXT("SetShouldMove called on %s: Current=%s, Requested=%s"),
+		*GetNameSafe(GetOwner()),
+		ShouldMove ? TEXT("true") : TEXT("false"),
+		Mover ? TEXT("true") : TEXT("false")
+	);
 	ShouldMove = Mover;
+	if (ShouldMove)
+	{
+		if (OpenSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, OpenSound, GetOwner()->GetActorLocation(), 1.0f, 1.0f, 0.0f, DoorAttenuation);
+		}	
+	}
+	else
+	{
+		if (CloseSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, CloseSound, GetOwner()->GetActorLocation(), 1.0f, 1.0f, 0.0f, DoorAttenuation);
+		}
+	}
 }
 
 bool UMoverComponent::GetShouldMove() const

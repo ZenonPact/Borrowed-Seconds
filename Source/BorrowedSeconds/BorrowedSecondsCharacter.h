@@ -13,6 +13,7 @@ class UCameraComponent;
 class UInputAction;
 class UGrabberComponent;
 class UPhysicsHandleComponent;
+class USoundBase;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -65,6 +66,8 @@ protected:
 	
 public:
 	ABorrowedSecondsCharacter();
+
+	virtual void Tick(float DeltaTime) override;
 
 protected:
 
@@ -139,6 +142,15 @@ public:
 
 	/** Returns first person camera component **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
+
+	UPROPERTY(EditAnywhere, Category = "Audio|Footsteps")
+	TArray<TObjectPtr<USoundBase>> FootstepSounds;
+
+	UPROPERTY(EditAnywhere, Category = "Audio|Footsteps", meta = (ClampMin = "1.0"))
+	float FootstepDistance = 180.0f;
+
+	float AccumulatedFootstepDistance = 0.0f;
+	int32 LastFootstepSoundIndex = INDEX_NONE;
 
 };
 

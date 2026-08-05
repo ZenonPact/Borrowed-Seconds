@@ -6,6 +6,8 @@
 #include "Components/ActorComponent.h"
 #include "MoverComponent.generated.h"
 
+class USoundBase;
+class USoundAttenuation;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class BORROWEDSECONDS_API UMoverComponent : public UActorComponent
@@ -36,6 +38,15 @@ public:
 	FVector TargetPosition;
 	float MoveSpeed;
 
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	USoundBase* OpenSound = nullptr;	
+
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	USoundBase* CloseSound = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	USoundAttenuation* DoorAttenuation = nullptr;
+
 private:
-	bool ShouldMove;
+	bool ShouldMove = false;
 };

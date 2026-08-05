@@ -13,6 +13,7 @@ BorrowedSecondsShare/
 AudioSource/Original/
 
 # IDE and generated project files
+.local-tools/
 .vs/
 .vscode/
 .idea/

@@ -19,6 +19,7 @@ void UCountdownComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+
 	TimeRemaining = StartingTime;
 	
 }
@@ -31,14 +32,31 @@ void UCountdownComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	
 	if (bIsRunning)
 	{
-		TimeRemaining -= DeltaTime;
+		TimeRemaining = FMath::Max(TimeRemaining - DeltaTime, 0.f);
+		TimeUntilNextPulse -= DeltaTime;
+		const int32 DisplayedSecond = FMath::CeilToInt(TimeRemaining);
+
+		if (LastDisplayedSecond != DisplayedSecond)
+		{
+			LastDisplayedSecond = DisplayedSecond;
+			OnCountdownDisplayChanged.Broadcast(TimeRemaining);
+		}
 		if (TimeRemaining <= 0)
 		{
 			bIsRunning = false;
 			bHasExpired = true;
-			OnCountdownExpired.Broadcast();
+			OnCountdownExpired.Broadcast(true);
+		}
+		else if (TimeUntilNextPulse <= 0.0f)
+		{
+			OnCountdownPulse.Broadcast(TimeRemaining);
+
+			const float RemainingRatio = FMath::Clamp(TimeRemaining / StartingTime, 0.f, 1.f);
+
+			TimeUntilNextPulse = FMath::Lerp(0.15f, 1.f, RemainingRatio);
 		}
 	}
+	
 }
 
 void UCountdownComponent::StartCountdown()
@@ -54,6 +72,8 @@ void UCountdownComponent::PauseCountdown()
 void UCountdownComponent::ResetCountdown()
 {
 	TimeRemaining = StartingTime;
+	TimeUntilNextPulse = .2f;
+	LastDisplayedSecond = INDEX_NONE;
 	bHasExpired = false;
 }
 
@@ -67,5 +87,5 @@ void UCountdownComponent::ForceExpire()
 	TimeRemaining = 0.f;
 	bIsRunning = false;
 	bHasExpired = true;
-	OnCountdownExpired.Broadcast();
+	OnCountdownExpired.Broadcast(false);
 }

@@ -6,7 +6,9 @@
 #include "Components/ActorComponent.h"
 #include "CountdownComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCountdownExpired);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FOnCountdownExpired, bool, bPlayExpirationSound);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCountdownPulse, float, RemainingTime);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCountdownDisplayChanged, float, RemainingTime);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class BORROWEDSECONDS_API UCountdownComponent : public UActorComponent
@@ -34,11 +36,14 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	float TimeRemaining;
 
-	UPROPERTY()
-	bool bIsRunning;
+	UPROPERTY(BlueprintAssignable)
+	FOnCountdownPulse OnCountdownPulse;
 
 	UPROPERTY()
-	bool bHasExpired;
+	bool bIsRunning = false;
+
+	UPROPERTY()
+	bool bHasExpired = false;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnCountdownExpired OnCountdownExpired;
@@ -50,4 +55,13 @@ public:
 	float GetTimeRemaining() const;
 	
 	void ForceExpire();
+
+	UPROPERTY(BlueprintAssignable, Category = "Countdown|Events")
+	FOnCountdownDisplayChanged OnCountdownDisplayChanged;
+
+private:
+	UPROPERTY()
+	float TimeUntilNextPulse = .2f;
+
+	int32 LastDisplayedSecond = INDEX_NONE;
 };

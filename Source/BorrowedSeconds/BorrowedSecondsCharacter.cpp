@@ -68,6 +68,36 @@ void ABorrowedSecondsCharacter::BeginPlay()
 	Movement->GravityScale = GravityScale;
 }
 
+void ABorrowedSecondsCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	UCharacterMovementComponent* Movement = GetCharacterMovement();
+	const float HorizontalSpeed = GetVelocity().Size2D();
+
+	if (Movement->IsMovingOnGround() && HorizontalSpeed > 10.0f)
+	{
+		AccumulatedFootstepDistance += HorizontalSpeed * DeltaTime;
+
+		if (AccumulatedFootstepDistance >= FootstepDistance)
+		{
+			if (!FootstepSounds.IsEmpty())
+			{
+				int32 NewFootstepIndex;
+
+				do
+				{
+					NewFootstepIndex = FMath::RandRange(0, FootstepSounds.Num() - 1);
+				} while (FootstepSounds.Num() > 1 && NewFootstepIndex == LastFootstepSoundIndex);
+
+				UGameplayStatics::PlaySound2D(this, FootstepSounds[NewFootstepIndex]);
+				LastFootstepSoundIndex = NewFootstepIndex;
+				AccumulatedFootstepDistance -= FootstepDistance;
+			}
+		}
+	}
+}
+
 void ABorrowedSecondsCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {	
 	// Set up action bindings
@@ -85,13 +115,13 @@ void ABorrowedSecondsCharacter::SetupPlayerInputComponent(UInputComponent* Playe
 		EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &ABorrowedSecondsCharacter::MouseLookInput);
 
 		// Grab
-		EnhancedInputComponent->BindAction(GrabAction, ETriggerEvent::Triggered, Grabber, &UGrabberComponent::Grab);
+		EnhancedInputComponent->BindAction(GrabAction, ETriggerEvent::Started, Grabber, &UGrabberComponent::Grab);
 
 		// Release
-		EnhancedInputComponent->BindAction(ReleaseAction, ETriggerEvent::Triggered, Grabber, &UGrabberComponent::Release);
+		EnhancedInputComponent->BindAction(ReleaseAction, ETriggerEvent::Started, Grabber, &UGrabberComponent::Release);
 
 		// Reset
-		EnhancedInputComponent->BindAction(ResetAction, ETriggerEvent::Triggered, this, &ABorrowedSecondsCharacter::ResetAllCells);
+		EnhancedInputComponent->BindAction(ResetAction, ETriggerEvent::Started, this, &ABorrowedSecondsCharacter::ResetAllCells);
 	}
 	else
 	{

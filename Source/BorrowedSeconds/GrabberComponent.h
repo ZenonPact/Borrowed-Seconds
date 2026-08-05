@@ -7,7 +7,9 @@
 #include "GrabberComponent.generated.h"
 
 class UPhysicsHandleComponent;
+class USoundBase;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGrabbedActorSignature,AActor*,InteractedActor);
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class BORROWEDSECONDS_API UGrabberComponent : public USceneComponent
 {
@@ -46,4 +48,15 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	UPhysicsHandleComponent* PhysicsHandle;
 	
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	USoundBase* GrabSound = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "Audio")
+	USoundBase* ReleaseSound = nullptr;
+
+	UPROPERTY(BlueprintAssignable, Category = "Interaction|Events")
+	FGrabbedActorSignature OnActorGrabbed;
+
+	UPROPERTY(BlueprintAssignable, Category = "Interaction|Events")
+	FGrabbedActorSignature OnActorReleased;
 };

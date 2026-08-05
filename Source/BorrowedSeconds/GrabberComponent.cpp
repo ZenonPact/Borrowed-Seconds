@@ -3,6 +3,8 @@
 
 #include "GrabberComponent.h"
 #include "CountdownComponent.h"
+#include "Sound/SoundBase.h"
+#include <Kismet/GameplayStatics.h>
 #include "PhysicsEngine/PhysicsHandleComponent.h"
 
 // Sets default values for this component's properties
@@ -50,6 +52,11 @@ void UGrabberComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 
 void UGrabberComponent::Grab()
 {
+	if (!PhysicsHandle || PhysicsHandle->GetGrabbedComponent())
+	{
+		return;
+	}
+
 	FHitResult OutHit;
 	FVector StartLocation = GetComponentLocation();
 	FVector EndLocation = StartLocation + GetForwardVector() * MaxDistance;
@@ -69,6 +76,14 @@ void UGrabberComponent::Grab()
 			}
 			OutHit.GetComponent()->SetSimulatePhysics(true);
 			PhysicsHandle->GrabComponentAtLocationWithRotation(OutHit.GetComponent(), NAME_None, OutHit.ImpactPoint, OutHit.GetComponent()->GetComponentRotation());
+			if (PhysicsHandle->GetGrabbedComponent() == OutHit.GetComponent())
+			{
+				OnActorGrabbed.Broadcast(OutHit.GetActor());
+			}
+			if (GrabSound)
+			{
+				UGameplayStatics::PlaySoundAtLocation(this, GrabSound, OutHit.GetComponent()->GetComponentLocation());
+			}
 			SetComponentTickEnabled(true);
 		}
 	}
@@ -76,13 +91,27 @@ void UGrabberComponent::Grab()
 
 void UGrabberComponent::Release()
 {
-	if (!PhysicsHandle)
-	{
-		return;
-	}
 	if (PhysicsHandle->GetGrabbedComponent())
 	{
+		UPrimitiveComponent* GrabbedComponent =
+			PhysicsHandle->GetGrabbedComponent();
+
+		AActor* ReleasedActor = GrabbedComponent->GetOwner();
+
+		const FVector ReleaseLocation = GrabbedComponent->GetComponentLocation();
+
+		if (ReleaseSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, ReleaseSound, ReleaseLocation);
+		}
+
 		PhysicsHandle->ReleaseComponent();
+
+		if (ReleasedActor)
+		{
+			OnActorReleased.Broadcast(ReleasedActor);
+		}
+
 		SetComponentTickEnabled(false);
 	}
 }
